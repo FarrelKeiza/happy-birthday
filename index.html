@@ -146,8 +146,11 @@
                 <div class="card2">
                     <div class="card2-content">
                         <h3>To You!</h3>
-                        <h2>Happy birthday Tia! Wishing you a day filled with love, joy, and all your favorite things. May this year bring you endless happiness and unforgettable memories.
-                            Anyway, jaga kesehatan selalu ya, tidur yang cukup, makan yang teratur, dan jangan lupa bahagia setiap hari. Semoga semua impian dan harapanmu tercapai di tahun ini. Selamat ulang tahun! 🎉🎂🎈
+                        <h2>Happy birthday Tia! Wishing you a day filled with love, joy, and all your favorite things.
+                            May this year bring you endless happiness and unforgettable memories.
+                            Anyway, jaga kesehatan selalu ya, tidur yang cukup, makan yang teratur, dan jangan lupa
+                            bahagia setiap hari. Semoga semua impian dan harapanmu tercapai di tahun ini. Selamat ulang
+                            tahun! 🎉🎂🎈
                         </h2>
 
                         <div class="imageCute2">
@@ -173,6 +176,7 @@
                 <div class="cobertura"></div>
                 <div class="bizcocho"></div>
                 <p class="test2">Allow Microphone permission, then blow out the candles!</p>
+                <button id="micButton">Allow</button>
             </div>
 
         </div>
@@ -180,7 +184,7 @@
 
     </div>
     <!-- 🎵 Background Music -->
-<audio id="bgMusic" src="happy-birthday.mp3" loop></audio>
+    <audio id="bgMusic" src="happy-birthday.mp3" loop></audio>
 
 
 </body>
@@ -274,7 +278,7 @@
 
 
     let mailBox = document.querySelector('.mail')
-    
+
     let boxmail = document.querySelector('.boxMail')
     var close = document.querySelector('.fa-xmark')
     mailBox.onclick = function () {
@@ -299,25 +303,27 @@
         boxCake.classList.remove("active");
     });
 
-    var navigator = window.navigator;
-    navigator.getUserMedia_ = navigator.getUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.mozGetUserMedia;
-    if (navigator.getUserMedia_) {
-        navigator.getUserMedia({
-            audio: true
-        },
-            function (stream) {
-                var fire0 = document.getElementById("fire0");
-                var fire1 = document.getElementById("fire1");
-                var fire2 = document.getElementById("fire2");
-                var fire3 = document.getElementById("fire3");
-                var fire4 = document.getElementById("fire4");
+    document.getElementById("micButton").addEventListener("click", function () {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("getUserMedia not supported in your browser");
+            return;
+        }
 
-                audioContext = new AudioContext();
-                analyser = audioContext.createAnalyser();
-                microphone = audioContext.createMediaStreamSource(stream);
-                javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(function (stream) {
+                // Sembunyikan tombol setelah diizinkan
+                document.getElementById("micButton").style.display = "none";
+
+                const fire0 = document.getElementById("fire0");
+                const fire1 = document.getElementById("fire1");
+                const fire2 = document.getElementById("fire2");
+                const fire3 = document.getElementById("fire3");
+                const fire4 = document.getElementById("fire4");
+
+                const audioContext = new AudioContext();
+                const analyser = audioContext.createAnalyser();
+                const microphone = audioContext.createMediaStreamSource(stream);
+                const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
 
                 analyser.smoothingTimeConstant = 0.8;
                 analyser.fftSize = 1024;
@@ -326,22 +332,18 @@
                 analyser.connect(javascriptNode);
                 javascriptNode.connect(audioContext.destination);
 
-                var flameTimer = 0;
+                let flameTimer = 0;
 
                 javascriptNode.onaudioprocess = function () {
-                    var array = new Uint8Array(analyser.frequencyBinCount);
+                    const array = new Uint8Array(analyser.frequencyBinCount);
                     analyser.getByteFrequencyData(array);
-                    var values = 0;
 
-                    var length = array.length;
-                    for (var i = 0; i < length; i++) {
-                        values += (array[i]);
-                    }
-
-                    var average = values / length;
+                    let values = 0;
+                    for (let i = 0; i < array.length; i++) values += array[i];
+                    const average = values / array.length;
 
                     if (flameTimer <= 50) flameTimer++;
-                    if ((average < 5) && (flameTimer > 50) && (fire4.style.display != "none")) {
+                    if (average < 5 && flameTimer > 50 && fire4.style.display != "none") {
                         flameTimer = 0;
                         fire0.style.display = "block";
                         fire1.style.display = "block";
@@ -355,33 +357,31 @@
                     if (average > 15) fire2.style.display = "none";
                     if (average > 20) fire3.style.display = "none";
                     if (average > 30) fire4.style.display = "none";
-
-                } // end fn stream
-            },
-            function (err) {
-                console.log("The following error occured: " + err.name)
+                };
+            })
+            .catch(function (err) {
+                console.log("Microphone access denied:", err);
+                alert("Please allow microphone permission to blow the candles!");
             });
-    } else {
-        console.log("getUserMedia not supported");
-    }
+    });
 
     const bgMusic = document.getElementById("bgMusic");
-        document.addEventListener("click", () => {
-            bgMusic.play();
-        }, { once: true });
+    document.addEventListener("click", () => {
+        bgMusic.play();
+    }, { once: true });
 
-        bgMusic.volume = 0;
-        bgMusic.addEventListener("play", () => {
-            let vol = 0;
-            const fade = setInterval(() => {
-                if (vol < 1) {
-                    vol += 0.02;
-                    bgMusic.volume = vol;
-                } else {
-                    clearInterval(fade);
-                }
-            }, 200);
-        });
+    bgMusic.volume = 0;
+    bgMusic.addEventListener("play", () => {
+        let vol = 0;
+        const fade = setInterval(() => {
+            if (vol < 1) {
+                vol += 0.02;
+                bgMusic.volume = vol;
+            } else {
+                clearInterval(fade);
+            }
+        }, 200);
+    });
 
 </script>
 
